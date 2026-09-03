@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ngogialoc-ptpmql01")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2e8c18f1ff425bbfa65561842b3c5899f5adbc6e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8fb4fca10b4b26155638cde11702f334ea4ec343")]
 [assembly: System.Reflection.AssemblyProductAttribute("ngogialoc-ptpmql01")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ngogialoc-ptpmql01")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
