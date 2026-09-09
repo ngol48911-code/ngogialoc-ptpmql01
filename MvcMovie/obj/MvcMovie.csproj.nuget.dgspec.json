@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\laragon\\www\\ngogialoc-ptpmql01\\MvcMovie\\MvcMovie.csproj": {}
+    "C:\\laragon\\www\\ngogialoc-ptpmql01\\MvcMovie\\MvcMovie.csproj": {}
   },
   "projects": {
-    "c:\\laragon\\www\\ngogialoc-ptpmql01\\MvcMovie\\MvcMovie.csproj": {
+    "C:\\laragon\\www\\ngogialoc-ptpmql01\\MvcMovie\\MvcMovie.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\laragon\\www\\ngogialoc-ptpmql01\\MvcMovie\\MvcMovie.csproj",
+        "projectUniqueName": "C:\\laragon\\www\\ngogialoc-ptpmql01\\MvcMovie\\MvcMovie.csproj",
         "projectName": "MvcMovie",
-        "projectPath": "c:\\laragon\\www\\ngogialoc-ptpmql01\\MvcMovie\\MvcMovie.csproj",
+        "projectPath": "C:\\laragon\\www\\ngogialoc-ptpmql01\\MvcMovie\\MvcMovie.csproj",
         "packagesPath": "C:\\Users\\Hi\\.nuget\\packages\\",
-        "outputPath": "c:\\laragon\\www\\ngogialoc-ptpmql01\\MvcMovie\\obj\\",
+        "outputPath": "C:\\laragon\\www\\ngogialoc-ptpmql01\\MvcMovie\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Hi\\AppData\\Roaming\\NuGet\\NuGet.Config"
