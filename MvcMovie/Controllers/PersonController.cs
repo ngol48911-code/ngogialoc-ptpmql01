@@ -13,7 +13,9 @@ namespace MvcMovie.Controllers
         public IActionResult Index(Person ps)
         {
             string strOutput="xin chao" +ps.PersonId + "-" + ps.FullName +"-" + ps.Address;
+            string ten=" toi ten la "+ ps.FullName;
             ViewBag.infoPerson= strOutput;
+            ViewData["name"]=ten;
             return View();
         }
     }
