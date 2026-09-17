@@ -10,5 +10,6 @@ namespace MvcMovie.Data
         }
 
         public DbSet<Person> Person { get; set; }
+        public DbSet<Movie> Movie { get; set; }
     }
 }   
