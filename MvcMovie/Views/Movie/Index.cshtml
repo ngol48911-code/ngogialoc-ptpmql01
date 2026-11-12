@@ -1,0 +1,89 @@
+@{
+    ViewData["Title"] = "Danh sách phim";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Danh sách phim</h1>
+    <button type="button" class="btn btn-primary" id="createMovieButton">Thêm phim</button>
+</div>
+
+<div id="movieAlert" class="alert d-none" role="alert"></div>
+
+<div class="row g-2 mb-3">
+    <div class="col-md-5">
+        <input id="movieSearch" class="form-control" placeholder="Tìm theo tên phim..." />
+    </div>
+    <div class="col-md-5">
+        <input id="movieGenreFilter" class="form-control" placeholder="Lọc theo thể loại..." />
+    </div>
+    <div class="col-md-2">
+        <select id="moviePageSize" class="form-select" aria-label="Số dòng mỗi trang">
+            <option value="5">5 dòng</option>
+            <option value="10" selected>10 dòng</option>
+            <option value="20">20 dòng</option>
+        </select>
+    </div>
+</div>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Tên phim</th>
+            <th>Ngày phát hành</th>
+            <th>Thể loại</th>
+            <th>Giá</th>
+            <th>Hành động</th>
+        </tr>
+    </thead>
+    <tbody id="movieTableBody">
+        <tr><td colspan="6" class="text-center">Đang tải dữ liệu...</td></tr>
+    </tbody>
+</table>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+    <span id="moviePageInfo" class="text-muted"></span>
+    <nav aria-label="Phân trang phim">
+        <ul id="moviePagination" class="pagination mb-0"></ul>
+    </nav>
+</div>
+
+<div class="modal fade" id="movieModal" tabindex="-1" aria-labelledby="movieModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="movieModalLabel">Thêm phim</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <form id="movieForm">
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <div id="movieFormError" class="alert alert-danger d-none"></div>
+                    <div class="mb-3">
+                        <label for="movieTitle" class="form-label">Tên phim</label>
+                        <input id="movieTitle" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="movieReleaseDate" class="form-label">Ngày phát hành</label>
+                        <input id="movieReleaseDate" type="date" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label for="movieGenre" class="form-label">Thể loại</label>
+                        <input id="movieGenre" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="moviePrice" class="form-label">Giá</label>
+                        <input id="moviePrice" type="number" step="0.01" min="0" class="form-control" />
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-primary" id="saveMovieButton">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/movie-crud.js" asp-append-version="true"></script>
+}

@@ -20,4 +20,11 @@
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="10.0.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="MvcMovie.Tests\**" />
+    <EmbeddedResource Remove="MvcMovie.Tests\**" />
+    <Content Remove="MvcMovie.Tests\**" />
+    <None Remove="MvcMovie.Tests\**" />
+  </ItemGroup>
+
 </Project>

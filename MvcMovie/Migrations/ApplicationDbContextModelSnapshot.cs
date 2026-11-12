@@ -17,6 +17,72 @@ namespace MvcMovie.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "10.0.12");
 
+            modelBuilder.Entity("MvcMovie.Models.Faculty", b =>
+                {
+                    b.Property<string>("FacultyId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FacultyName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("FacultyId");
+
+                    b.ToTable("Faculties");
+
+                    b.HasData(
+                        new
+                        {
+                            FacultyId = "01",
+                            FacultyName = "Công nghệ thông tin"
+                        },
+                        new
+                        {
+                            FacultyId = "02",
+                            FacultyName = "Cơ - Điện"
+                        },
+                        new
+                        {
+                            FacultyId = "03",
+                            FacultyName = "Dầu khí và Năng lượng"
+                        },
+                        new
+                        {
+                            FacultyId = "04",
+                            FacultyName = "Giáo dục Quốc phòng"
+                        },
+                        new
+                        {
+                            FacultyId = "05",
+                            FacultyName = "Khoa học cơ bản"
+                        },
+                        new
+                        {
+                            FacultyId = "06",
+                            FacultyName = "Khoa học và Kỹ thuật Địa chất"
+                        },
+                        new
+                        {
+                            FacultyId = "07",
+                            FacultyName = "Kinh tế và Quản trị kinh doanh"
+                        },
+                        new
+                        {
+                            FacultyId = "08",
+                            FacultyName = "Lý luận chính trị"
+                        },
+                        new
+                        {
+                            FacultyId = "09",
+                            FacultyName = "Mỏ"
+                        },
+                        new
+                        {
+                            FacultyId = "10",
+                            FacultyName = "Môi trường"
+                        });
+                });
+
             modelBuilder.Entity("MvcMovie.Models.Movie", b =>
                 {
                     b.Property<int>("Id")
@@ -54,6 +120,56 @@ namespace MvcMovie.Migrations
                     b.HasKey("PersonId");
 
                     b.ToTable("Person");
+                });
+
+            modelBuilder.Entity("MvcMovie.Models.Student", b =>
+                {
+                    b.Property<string>("StudentId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Address")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FacultyId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("HeDaoTao")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("NamNhapHoc")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("University")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("StudentId");
+
+                    b.HasIndex("FacultyId");
+
+                    b.ToTable("Students");
+                });
+
+            modelBuilder.Entity("MvcMovie.Models.Student", b =>
+                {
+                    b.HasOne("MvcMovie.Models.Faculty", "Faculty")
+                        .WithMany("Students")
+                        .HasForeignKey("FacultyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Faculty");
+                });
+
+            modelBuilder.Entity("MvcMovie.Models.Faculty", b =>
+                {
+                    b.Navigation("Students");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,0 +1,46 @@
+@model MvcMovie.Models.Student
+
+@{
+    ViewData["Title"] = "Xóa Sinh viên";
+}
+
+<h1>Xóa Sinh viên</h1>
+
+<h3>Bạn có chắc chắn muốn xóa sinh viên này?</h3>
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.StudentId)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.StudentId)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.FullName)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.FullName)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.Address)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.Address)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.University)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.University)</dd>
+
+        <dt class="col-sm-3">@Html.DisplayNameFor(model => model.NamNhapHoc)</dt>
+        <dd class="col-sm-9">@Html.DisplayFor(model => model.NamNhapHoc)</dd>
+
+        <dt class="col-sm-3">Hệ đào tạo</dt>
+        <dd class="col-sm-9">
+            @if (Model?.HeDaoTao == "21") { <text>Đại học chính quy</text> }
+            else if (Model?.HeDaoTao == "22") { <text>Cao đẳng</text> }
+            else if (Model?.HeDaoTao == "23") { <text>Liên thông</text> }
+            else if (Model?.HeDaoTao == "24") { <text>Vừa làm vừa học</text> }
+            else { @Model?.HeDaoTao }
+        </dd>
+
+        <dt class="col-sm-3">Ngành học (Khoa)</dt>
+        <dd class="col-sm-9">@Model?.Faculty?.FacultyName</dd>
+    </dl>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="StudentId" />
+        <input type="submit" value="Xác nhận xóa" class="btn btn-danger" /> |
+        <a asp-action="Index">Quay lại danh sách</a>
+    </form>
+</div>

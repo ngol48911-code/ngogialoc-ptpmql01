@@ -28,10 +28,101 @@ namespace MvcMovie.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var model = await _context.Person.ToListAsync();
-            return View(model);
+            return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetPersons(
+            string? searchString = null,
+            int pageIndex = 1,
+            int pageSize = 10)
+        {
+            var query = _context.Person
+                .AsNoTracking()
+                .AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(searchString))
+            {
+                var pattern = $"%{searchString.Trim()}%";
+                query = query.Where(p =>
+                    EF.Functions.Like(p.PersonId!, pattern) ||
+                    EF.Functions.Like(p.FullName!, pattern) ||
+                    EF.Functions.Like(p.Address!, pattern));
+            }
+
+            var persons = query
+                .OrderBy(p => p.PersonId)
+                .Select(p => new PersonResponseDto(p.PersonId, p.FullName, p.Address))
+                ;
+
+            return Ok(await PagedResult<PersonResponseDto>.CreateAsync(
+                persons, pageIndex, pageSize));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetPersonById(string id)
+        {
+            var person = await _context.Person.FindAsync(id);
+            return person == null
+                ? NotFound(new { message = "Không tìm thấy người dùng." })
+                : Ok(new PersonResponseDto(person.PersonId, person.FullName, person.Address));
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateAjax([FromBody] Person? person)
+        {
+            if (person == null || string.IsNullOrWhiteSpace(person.PersonId))
+            {
+                return BadRequest(new { message = "Mã và dữ liệu Person là bắt buộc." });
+            }
+
+            if (await _context.Person.AnyAsync(p => p.PersonId == person.PersonId))
+            {
+                return BadRequest(new { message = "Mã Person đã tồn tại." });
+            }
+
+            _context.Person.Add(person);
+            await _context.SaveChangesAsync();
+            return Ok(new PersonResponseDto(person.PersonId, person.FullName, person.Address));
+        }
+
+        [HttpPut]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditAjax(string id, [FromBody] Person? person)
+        {
+            if (person == null)
+            {
+                return BadRequest(new { message = "Dữ liệu Person không hợp lệ." });
+            }
+
+            var existingPerson = await _context.Person.FindAsync(id);
+            if (existingPerson == null)
+            {
+                return NotFound(new { message = "Không tìm thấy người dùng." });
+            }
+
+            existingPerson.FullName = person.FullName;
+            existingPerson.Address = person.Address;
+            await _context.SaveChangesAsync();
+            return Ok(new PersonResponseDto(existingPerson.PersonId, existingPerson.FullName, existingPerson.Address));
+        }
+
+        [HttpDelete]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteAjax(string id)
+        {
+            var person = await _context.Person.FindAsync(id);
+            if (person == null)
+            {
+                return NotFound(new { message = "Không tìm thấy người dùng." });
+            }
+
+            _context.Person.Remove(person);
+            await _context.SaveChangesAsync();
+            return Ok(new { message = "Đã xóa Person." });
         }
 
         public IActionResult Create()

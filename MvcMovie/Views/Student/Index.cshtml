@@ -1,0 +1,147 @@
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    ViewData["Title"] = "Danh sách Sinh viên";
+    var years = ViewBag.NamNhapHoc as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>();
+    var trainingTypes = ViewBag.HeDaoTao as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>();
+    var faculties = ViewBag.FacultyId as SelectList ?? new SelectList(Enumerable.Empty<SelectListItem>());
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Danh sách Sinh viên</h1>
+    <button type="button" class="btn btn-primary" id="createStudentButton">Thêm sinh viên</button>
+</div>
+
+<div id="studentAlert" class="alert d-none" role="alert"></div>
+
+<div class="row g-2 mb-3">
+    <div class="col-md-6">
+        <input id="studentSearch" class="form-control" placeholder="Tìm mã, họ tên hoặc địa chỉ..." />
+    </div>
+    <div class="col-md-4">
+        <select id="studentFacultyFilter" class="form-select">
+            <option value="">-- Tất cả khoa --</option>
+            @foreach (var faculty in faculties)
+            {
+                <option value="@faculty.Value">@faculty.Text</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-2">
+        <select id="studentPageSize" class="form-select" aria-label="Số dòng mỗi trang">
+            <option value="5">5 dòng</option>
+            <option value="10" selected>10 dòng</option>
+            <option value="20">20 dòng</option>
+        </select>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-striped align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>Mã sinh viên</th>
+                <th>Họ và tên</th>
+                <th>Địa chỉ</th>
+                <th>Trường đại học</th>
+                <th>Năm nhập học</th>
+                <th>Hệ đào tạo</th>
+                <th>Khoa</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody id="studentTableBody">
+            <tr>
+                <td colspan="8" class="text-center">Đang tải dữ liệu...</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+    <span id="studentPageInfo" class="text-muted"></span>
+    <nav aria-label="Phân trang sinh viên">
+        <ul id="studentPagination" class="pagination mb-0"></ul>
+    </nav>
+</div>
+
+<div class="modal fade" id="studentModal" tabindex="-1" aria-labelledby="studentModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="studentModalLabel">Thêm sinh viên</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <form id="studentForm" novalidate>
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <div id="formError" class="alert alert-danger d-none"></div>
+                    <input type="hidden" id="studentId" />
+
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="fullName" class="form-label">Họ và tên</label>
+                            <input id="fullName" name="FullName" class="form-control" />
+                            <div class="invalid-feedback" data-error-for="FullName"></div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="university" class="form-label">Trường đại học</label>
+                            <input id="university" name="University" class="form-control"
+                                   value="Trường Đại học Mỏ - Địa chất" />
+                            <div class="invalid-feedback" data-error-for="University"></div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Địa chỉ</label>
+                        <input id="address" name="Address" class="form-control" />
+                        <div class="invalid-feedback" data-error-for="Address"></div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label for="namNhapHoc" class="form-label">Năm nhập học</label>
+                            <select id="namNhapHoc" name="NamNhapHoc" class="form-select">
+                                <option value="">-- Chọn năm --</option>
+                                @foreach (var year in years)
+                                {
+                                    <option value="@year.Value">@year.Text</option>
+                                }
+                            </select>
+                            <div class="invalid-feedback" data-error-for="NamNhapHoc"></div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="heDaoTao" class="form-label">Hệ đào tạo</label>
+                            <select id="heDaoTao" name="HeDaoTao" class="form-select">
+                                <option value="">-- Chọn hệ --</option>
+                                @foreach (var trainingType in trainingTypes)
+                                {
+                                    <option value="@trainingType.Value">@trainingType.Text</option>
+                                }
+                            </select>
+                            <div class="invalid-feedback" data-error-for="HeDaoTao"></div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label for="facultyId" class="form-label">Khoa</label>
+                            <select id="facultyId" name="FacultyId" class="form-select">
+                                <option value="">-- Chọn khoa --</option>
+                                @foreach (var faculty in faculties)
+                                {
+                                    <option value="@faculty.Value">@faculty.Text</option>
+                                }
+                            </select>
+                            <div class="invalid-feedback" data-error-for="FacultyId"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-primary" id="saveStudentButton">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/student-crud.js" asp-append-version="true"></script>
+}

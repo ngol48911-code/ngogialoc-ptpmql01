@@ -1,0 +1,71 @@
+@model MvcMovie.Models.Student
+
+@{
+    ViewData["Title"] = "Thêm Sinh viên";
+}
+
+<h1>Thêm Sinh viên mới</h1>
+
+<p class="text-muted">Mã sinh viên sẽ tự động sinh theo công thức: [Năm][Hệ][Khoa][STT tự tăng]</p>
+<hr />
+<div class="row">
+    <div class="col-md-6">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <div class="form-group mb-3">
+                <label asp-for="FullName" class="control-label"></label>
+                <input asp-for="FullName" class="form-control" />
+                <span asp-validation-for="FullName" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="Address" class="control-label"></label>
+                <input asp-for="Address" class="form-control" />
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="University" class="control-label"></label>
+                <input asp-for="University" class="form-control" value="Trường Đại học Mỏ - Địa chất" />
+                <span asp-validation-for="University" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="NamNhapHoc" class="control-label"></label>
+                <select asp-for="NamNhapHoc" class="form-control" asp-items="@((IEnumerable<SelectListItem>)ViewBag.NamNhapHoc)">
+                    <option value="">-- Chọn năm nhập học --</option>
+                </select>
+                <span asp-validation-for="NamNhapHoc" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="HeDaoTao" class="control-label"></label>
+                <select asp-for="HeDaoTao" class="form-control" asp-items="@((IEnumerable<SelectListItem>)ViewBag.HeDaoTao)">
+                    <option value="">-- Chọn hệ đào tạo --</option>
+                </select>
+                <span asp-validation-for="HeDaoTao" class="text-danger"></span>
+            </div>
+
+            <div class="form-group mb-3">
+                <label asp-for="FacultyId" class="control-label">Ngành học (Khoa)</label>
+                <select asp-for="FacultyId" class="form-control" asp-items="@((SelectList)ViewBag.FacultyId)">
+                    <option value="">-- Chọn ngành học / khoa --</option>
+                </select>
+                <span asp-validation-for="FacultyId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Thêm mới" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="mt-3">
+    <a asp-action="Index">Quay lại danh sách</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
