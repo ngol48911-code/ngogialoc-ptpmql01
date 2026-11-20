@@ -1,7 +1,7 @@
 {
   "format": 1,
   "restore": {
-    "c:\\laragon\\www\\ngogialoc-ptpmql01\\MvcMovie\\MvcMovie.Tests\\MvcMovie.Tests.csproj": {}
+    "C:\\laragon\\www\\ngogialoc-ptpmql01\\MvcMovie\\MvcMovie.Tests\\MvcMovie.Tests.csproj": {}
   },
   "projects": {
     "C:\\laragon\\www\\ngogialoc-ptpmql01\\MvcMovie\\MvcMovie.csproj": {
@@ -46,6 +46,14 @@
           "framework": "net10.0",
           "targetAlias": "net10.0",
           "dependencies": {
+            "Microsoft.AspNetCore.Identity.EntityFrameworkCore": {
+              "target": "Package",
+              "version": "[10.0.12, )"
+            },
+            "Microsoft.AspNetCore.Identity.UI": {
+              "target": "Package",
+              "version": "[10.0.12, )"
+            },
             "Microsoft.EntityFrameworkCore.Design": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
@@ -508,14 +516,14 @@
         }
       }
     },
-    "c:\\laragon\\www\\ngogialoc-ptpmql01\\MvcMovie\\MvcMovie.Tests\\MvcMovie.Tests.csproj": {
+    "C:\\laragon\\www\\ngogialoc-ptpmql01\\MvcMovie\\MvcMovie.Tests\\MvcMovie.Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\laragon\\www\\ngogialoc-ptpmql01\\MvcMovie\\MvcMovie.Tests\\MvcMovie.Tests.csproj",
+        "projectUniqueName": "C:\\laragon\\www\\ngogialoc-ptpmql01\\MvcMovie\\MvcMovie.Tests\\MvcMovie.Tests.csproj",
         "projectName": "MvcMovie.Tests",
-        "projectPath": "c:\\laragon\\www\\ngogialoc-ptpmql01\\MvcMovie\\MvcMovie.Tests\\MvcMovie.Tests.csproj",
+        "projectPath": "C:\\laragon\\www\\ngogialoc-ptpmql01\\MvcMovie\\MvcMovie.Tests\\MvcMovie.Tests.csproj",
         "packagesPath": "C:\\Users\\Hi\\.nuget\\packages\\",
-        "outputPath": "c:\\laragon\\www\\ngogialoc-ptpmql01\\MvcMovie\\MvcMovie.Tests\\obj\\",
+        "outputPath": "C:\\laragon\\www\\ngogialoc-ptpmql01\\MvcMovie\\MvcMovie.Tests\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Hi\\AppData\\Roaming\\NuGet\\NuGet.Config"

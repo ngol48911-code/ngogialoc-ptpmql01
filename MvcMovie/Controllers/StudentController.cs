@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -171,6 +172,7 @@ namespace MvcMovie.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateAjax([FromBody] Student? student)
         {
             if (student == null)
@@ -220,6 +222,7 @@ namespace MvcMovie.Controllers
 
         [HttpPut]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> EditAjax(string id, [FromBody] Student? student)
         {
             if (student == null)
@@ -276,6 +279,7 @@ namespace MvcMovie.Controllers
 
         [HttpDelete]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteAjax(string id)
         {
             var student = await _context.Student.FindAsync(id);
@@ -317,6 +321,7 @@ namespace MvcMovie.Controllers
         // ==========================================
         // CREATE - Thêm mới sinh viên
         // ==========================================
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             PrepareDropdowns();
@@ -329,6 +334,7 @@ namespace MvcMovie.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([Bind("FullName,Address,University,NamNhapHoc,HeDaoTao,FacultyId")] Student student)
         {
             if (!await _context.Faculty.AnyAsync())
@@ -357,6 +363,7 @@ namespace MvcMovie.Controllers
         // ==========================================
         // EDIT - Sửa sinh viên
         // ==========================================
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.Student == null)
@@ -375,6 +382,7 @@ namespace MvcMovie.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(string id, [Bind("StudentId,FullName,Address,University,NamNhapHoc,HeDaoTao,FacultyId")] Student student)
         {
             if (id != student.StudentId)
@@ -409,6 +417,7 @@ namespace MvcMovie.Controllers
         // ==========================================
         // DELETE - Xóa sinh viên
         // ==========================================
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null || _context.Student == null)
@@ -428,6 +437,7 @@ namespace MvcMovie.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             if (_context.Student == null)

@@ -386,3 +386,16 @@ C:\laragon\www\ngogialoc-ptpmql01\MvcMovie\MvcMovie.Tests\obj\Debug\net10.0\refi
 C:\laragon\www\ngogialoc-ptpmql01\MvcMovie\MvcMovie.Tests\obj\Debug\net10.0\MvcMovie.Tests.pdb
 C:\laragon\www\ngogialoc-ptpmql01\MvcMovie\MvcMovie.Tests\obj\Debug\net10.0\MvcMovie.Tests.genruntimeconfig.cache
 C:\laragon\www\ngogialoc-ptpmql01\MvcMovie\MvcMovie.Tests\obj\Debug\net10.0\ref\MvcMovie.Tests.dll
+C:\laragon\www\ngogialoc-ptpmql01\MvcMovie\MvcMovie.Tests\bin\Debug\net10.0\Microsoft.AspNetCore.Cryptography.Internal.dll
+C:\laragon\www\ngogialoc-ptpmql01\MvcMovie\MvcMovie.Tests\bin\Debug\net10.0\Microsoft.AspNetCore.Cryptography.KeyDerivation.dll
+C:\laragon\www\ngogialoc-ptpmql01\MvcMovie\MvcMovie.Tests\bin\Debug\net10.0\Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
+C:\laragon\www\ngogialoc-ptpmql01\MvcMovie\MvcMovie.Tests\bin\Debug\net10.0\Microsoft.AspNetCore.Identity.UI.dll
+C:\laragon\www\ngogialoc-ptpmql01\MvcMovie\MvcMovie.Tests\bin\Debug\net10.0\Microsoft.Extensions.Configuration.dll
+C:\laragon\www\ngogialoc-ptpmql01\MvcMovie\MvcMovie.Tests\bin\Debug\net10.0\Microsoft.Extensions.Configuration.Binder.dll
+C:\laragon\www\ngogialoc-ptpmql01\MvcMovie\MvcMovie.Tests\bin\Debug\net10.0\Microsoft.Extensions.Diagnostics.dll
+C:\laragon\www\ngogialoc-ptpmql01\MvcMovie\MvcMovie.Tests\bin\Debug\net10.0\Microsoft.Extensions.Diagnostics.Abstractions.dll
+C:\laragon\www\ngogialoc-ptpmql01\MvcMovie\MvcMovie.Tests\bin\Debug\net10.0\Microsoft.Extensions.FileProviders.Abstractions.dll
+C:\laragon\www\ngogialoc-ptpmql01\MvcMovie\MvcMovie.Tests\bin\Debug\net10.0\Microsoft.Extensions.FileProviders.Embedded.dll
+C:\laragon\www\ngogialoc-ptpmql01\MvcMovie\MvcMovie.Tests\bin\Debug\net10.0\Microsoft.Extensions.Identity.Core.dll
+C:\laragon\www\ngogialoc-ptpmql01\MvcMovie\MvcMovie.Tests\bin\Debug\net10.0\Microsoft.Extensions.Identity.Stores.dll
+C:\laragon\www\ngogialoc-ptpmql01\MvcMovie\MvcMovie.Tests\bin\Debug\net10.0\Microsoft.Extensions.Options.ConfigurationExtensions.dll

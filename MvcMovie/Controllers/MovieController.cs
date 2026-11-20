@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MvcMovie.Data;
@@ -66,6 +67,7 @@ public class MovieController : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> CreateAjax([FromBody] Movie? movie)
     {
         if (movie == null)
@@ -81,6 +83,7 @@ public class MovieController : Controller
 
     [HttpPut]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> EditAjax(int id, [FromBody] Movie? movie)
     {
         if (movie == null)
@@ -104,6 +107,7 @@ public class MovieController : Controller
 
     [HttpDelete]
     [ValidateAntiForgeryToken]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> DeleteAjax(int id)
     {
         var movie = await _context.Movie.FindAsync(id);

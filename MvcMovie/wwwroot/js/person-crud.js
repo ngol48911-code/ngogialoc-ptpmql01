@@ -32,7 +32,16 @@
             }
         });
         const payload = await response.json().catch(() => ({}));
-        if (!response.ok) throw new Error(payload.message || "Yêu cầu không thành công.");
+        if (!response.ok) {
+            if (response.status === 401) {
+                window.location.assign(`/Identity/Account/Login?ReturnUrl=${encodeURIComponent(location.pathname + location.search)}`);
+                throw new Error("Phiên đăng nhập đã hết hạn.");
+            }
+            if (response.status === 403) {
+                throw new Error("Bạn không có quyền thực hiện thao tác này.");
+            }
+            throw new Error(payload.message || "Yêu cầu không thành công.");
+        }
         return payload;
     };
     const queryString = () => {

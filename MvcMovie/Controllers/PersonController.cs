@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MvcMovie.Data;
@@ -72,6 +73,7 @@ namespace MvcMovie.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateAjax([FromBody] Person? person)
         {
             if (person == null || string.IsNullOrWhiteSpace(person.PersonId))
@@ -91,6 +93,7 @@ namespace MvcMovie.Controllers
 
         [HttpPut]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> EditAjax(string id, [FromBody] Person? person)
         {
             if (person == null)
@@ -112,6 +115,7 @@ namespace MvcMovie.Controllers
 
         [HttpDelete]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteAjax(string id)
         {
             var person = await _context.Person.FindAsync(id);
@@ -125,6 +129,7 @@ namespace MvcMovie.Controllers
             return Ok(new { message = "Đã xóa Person." });
         }
 
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
@@ -132,6 +137,7 @@ namespace MvcMovie.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Create([Bind("PersonId,FullName,Address")] Person person)
         {
             if (ModelState.IsValid)
@@ -143,6 +149,7 @@ namespace MvcMovie.Controllers
             return View(person);
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(string id)
         {
             if (id == null || _context.Person == null)
@@ -160,6 +167,7 @@ namespace MvcMovie.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(string id, [Bind("PersonId,FullName,Address")] Person person)
         {
             if (id != person.PersonId)
@@ -190,6 +198,7 @@ namespace MvcMovie.Controllers
             return View("Update", person);
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null || _context.Person == null)
@@ -208,6 +217,7 @@ namespace MvcMovie.Controllers
 
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(string id)
         {
             if (_context.Person == null)

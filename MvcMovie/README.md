@@ -10,7 +10,7 @@
 - Entity Framework Core 10
 - SQLite
 - Razor View
-- Bootstrap và jQuery Validation
+- Bootstrap 5.3.3
 
 Thông tin package được khai báo trong [MvcMovie.csproj](./MvcMovie.csproj).
 
