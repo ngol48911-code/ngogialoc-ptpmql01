@@ -1,10 +1,11 @@
 # Hệ thống quản lý dữ liệu ASP.NET Core MVC
 
-Repository này là bài thực hành phát triển ứng dụng web bằng **ASP.NET Core MVC (.NET 10)**. Project chính được đặt tại thư mục `MvcMovie/` và cung cấp ba nhóm chức năng quản lý:
+Repository này là bài thực hành phát triển ứng dụng web bằng **ASP.NET Core MVC (.NET 10)**. Project chính được đặt tại thư mục `MvcMovie/` và cung cấp các nhóm chức năng quản lý:
 
 - Quản lý Person
 - Quản lý phim
 - Quản lý sinh viên, có liên kết với danh mục khoa
+- Quản lý nhóm quyền Identity (chỉ Admin)
 
 Ứng dụng sử dụng **SQLite** để lưu dữ liệu, **Entity Framework Core** để truy cập và cập nhật cơ sở dữ liệu, **Razor View** để xây dựng giao diện, cùng **Bootstrap 5** cho layout và component.
 
@@ -41,7 +42,7 @@ Project mô phỏng một hệ thống quản trị dữ liệu đơn giản, tr
 - Nhận thông báo thành công hoặc lỗi ngay trên giao diện.
 - Quản lý quan hệ khóa ngoại giữa sinh viên và khoa.
 
-Các thao tác CRUD của ba module đều ưu tiên gọi API AJAX thay vì tải lại toàn bộ trang.
+Các thao tác CRUD đều ưu tiên gọi API AJAX thay vì tải lại toàn bộ trang.
 
 ---
 
@@ -86,7 +87,8 @@ ngogialoc-ptpmql01/
     │   ├── HelloWorldController.cs
     │   ├── PersonController.cs
     │   ├── MovieController.cs
-    │   └── StudentController.cs
+    │   ├── StudentController.cs
+    │   └── RoleController.cs
     ├── Data/
     │   └── ApplicationDbcontext.cs    # DbContext và seed Faculties
     ├── Models/
@@ -97,7 +99,9 @@ ngogialoc-ptpmql01/
     │   ├── PagedResult.cs
     │   ├── PersonResponseDto.cs
     │   ├── MovieResponseDto.cs
-    │   └── StudentResponseDto.cs
+    │   ├── StudentResponseDto.cs
+    │   ├── RoleDto.cs
+    │   └── RoleResponseDto.cs
     ├── Migrations/                    # Lịch sử migration EF Core
     ├── Views/
     │   ├── Shared/
@@ -106,7 +110,8 @@ ngogialoc-ptpmql01/
     │   ├── Person/
     │   ├── Movie/
     │   ├── Student/
-    │   └── Home/
+    │   ├── Home/
+    │   └── Role/
     ├── wwwroot/
     │   ├── css/
     │   ├── js/
@@ -191,6 +196,15 @@ Chức năng:
 - Validation bắt buộc cho họ tên, năm, hệ và khoa.
 - Cập nhật sinh viên mà không thay đổi `StudentId`.
 
+### 4.4. Quản lý nhóm quyền
+
+Trang `/Role` cho phép Admin xem, tìm kiếm, phân trang, thêm, sửa và xóa nhóm
+quyền dùng trực tiếp các bảng Identity `AspNetRoles` và `AspNetUserRoles`.
+Tìm kiếm tên không phân biệt hoa thường; kích thước trang hỗ trợ 5, 10 hoặc 20.
+Hai nhóm quyền hệ thống `Admin` và `User` không thể sửa hoặc xóa. Nhóm quyền
+đang được gán cho người dùng cũng không thể xóa. Mọi yêu cầu thay đổi dữ liệu
+đều gửi anti-forgery token trong header `RequestVerificationToken`.
+
 ---
 
 ## 5. Thiết kế cơ sở dữ liệu
@@ -216,7 +230,13 @@ Persons
 Movies
 Students
 Faculties
+AspNetRoles
+AspNetUserRoles
 ```
+
+Các bảng Identity đã có trong migration hiện tại; chức năng quản lý nhóm quyền
+tái sử dụng `RoleManager<IdentityRole>` và `UserManager<IdentityUser>`, không
+thêm bảng hoặc migration.
 
 ### Quan hệ
 
@@ -354,7 +374,7 @@ CSS tùy chỉnh nằm trong `wwwroot/css/app.css`. `app.css` được nạp sau
 Layout chung chứa:
 
 - Thanh điều hướng
-- Menu dẫn tới Person, Student và Movie
+- Menu dẫn tới Person, Student, Movie và Quản lý Role (Role chỉ hiển thị với Admin)
 - Container render `@RenderBody()`
 - Footer
 - Bootstrap Bundle JavaScript
@@ -434,6 +454,7 @@ http://localhost:5001
 | `/Person` | Danh sách Person |
 | `/Movie` | Danh sách phim |
 | `/Student` | Danh sách sinh viên |
+| `/Role` | Quản lý nhóm quyền (Admin) |
 
 ---
 
@@ -522,6 +543,7 @@ Các nhóm test có thể bao gồm:
 - CRUD Person.
 - CRUD Movie.
 - CRUD Student.
+- Tìm kiếm/phân trang và CRUD nhóm quyền, bao gồm bảo vệ role hệ thống và role có người dùng.
 - Phân trang và chuẩn hóa trang.
 
 Test database dùng provider InMemory thay vì ghi trực tiếp vào `App.db`.
@@ -559,6 +581,22 @@ Test database dùng provider InMemory thay vì ghi trực tiếp vào `App.db`.
 | `POST` | `/Student/CreateAjax` | Tạo sinh viên |
 | `PUT` | `/Student/EditAjax/{id}` | Cập nhật sinh viên |
 | `DELETE` | `/Student/DeleteAjax/{id}` | Xóa sinh viên |
+
+### Role
+
+| Method | Route | Chức năng |
+|---|---|---|
+| `GET` | `/Role/GetRoles?searchString=&pageIndex=1&pageSize=10` | Tìm kiếm và phân trang nhóm quyền |
+| `GET` | `/Role/GetRoleById/{id}` | Lấy nhóm quyền và số người dùng |
+| `POST` | `/Role/CreateAjax` | Tạo nhóm quyền (JSON + anti-forgery token) |
+| `PUT` | `/Role/EditAjax/{id}` | Đổi tên nhóm quyền tùy chỉnh |
+| `DELETE` | `/Role/DeleteAjax/{id}` | Xóa nhóm quyền trống |
+
+Toàn bộ `RoleController` yêu cầu role `Admin`. Validation trả về `400` với
+thông báo tiếng Việt; role không tồn tại trả về `404`. Không thể đổi tên/xóa
+`Admin` hoặc `User`, và không thể xóa role đang được gán cho người dùng. Giao
+diện dùng chung modal Bootstrap và các hàm `renderPagination`/`renderPageInfo`
+của `site.js`.
 
 Tham số phân trang mẫu:
 
@@ -612,6 +650,8 @@ Nguyên nhân phổ biến:
 - Dữ liệu JSON không đúng field.
 - Thiếu field bắt buộc.
 - `FacultyId` không tồn tại.
+- Tên nhóm quyền để trống, vượt 50 ký tự hoặc đã tồn tại.
+- Đang sửa/xóa role hệ thống hoặc xóa role đang có người dùng được gán.
 
 ### AJAX trả về 404
 
@@ -643,7 +683,7 @@ Hoặc dừng tiến trình đang giữ port rồi chạy lại.
 
 Các hướng phát triển phù hợp:
 
-- Thêm đăng nhập và phân quyền.
+- Mở rộng chính sách phân quyền và quản lý quyền truy cập theo chức năng.
 - Tách service/repository khỏi controller.
 - Thêm logging bằng Serilog.
 - Thêm validation phía server và client đầy đủ.

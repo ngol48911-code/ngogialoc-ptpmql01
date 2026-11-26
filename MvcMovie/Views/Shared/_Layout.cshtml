@@ -34,6 +34,12 @@
                             <li class="nav-item">
                                 <a class="nav-link" asp-controller="Movie" asp-action="Index">Phim</a>
                             </li>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-controller="Role" asp-action="Index">Quản lý Role</a>
+                                </li>
+                            }
                         }
                     </ul>
                     <partial name="_LoginPartial" />
