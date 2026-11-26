@@ -7,35 +7,18 @@ namespace MvcMovie.Tests;
 public class AuthorizationMetadataTests
 {
     [Theory]
-    [InlineData(typeof(StudentController), "CreateAjax")]
-    [InlineData(typeof(StudentController), "EditAjax")]
-    [InlineData(typeof(StudentController), "DeleteAjax")]
-    [InlineData(typeof(StudentController), "Create")]
-    [InlineData(typeof(StudentController), "Edit")]
-    [InlineData(typeof(StudentController), "Delete")]
-    [InlineData(typeof(StudentController), "DeleteConfirmed")]
-    [InlineData(typeof(PersonController), "CreateAjax")]
-    [InlineData(typeof(PersonController), "EditAjax")]
-    [InlineData(typeof(PersonController), "DeleteAjax")]
-    [InlineData(typeof(PersonController), "Create")]
-    [InlineData(typeof(PersonController), "Edit")]
-    [InlineData(typeof(PersonController), "Delete")]
-    [InlineData(typeof(PersonController), "DeleteConfirmed")]
-    [InlineData(typeof(MovieController), "CreateAjax")]
-    [InlineData(typeof(MovieController), "EditAjax")]
-    [InlineData(typeof(MovieController), "DeleteAjax")]
-    public void Mutations_require_admin_role(Type controllerType, string methodName)
+    [InlineData(typeof(StudentController))]
+    [InlineData(typeof(PersonController))]
+    [InlineData(typeof(MovieController))]
+    public void Data_controllers_require_login_and_delegate_action_permissions(Type controllerType)
     {
-        var methods = controllerType.GetMethods(BindingFlags.Instance | BindingFlags.Public)
-            .Where(candidate => candidate.Name == methodName)
-            .ToArray();
+        var authorize = Assert.Single(controllerType.GetCustomAttributes<AuthorizeAttribute>());
+        Assert.Null(authorize.Roles);
 
-        Assert.NotEmpty(methods);
-        foreach (var method in methods)
-        {
-            var authorize = Assert.Single(method.GetCustomAttributes<AuthorizeAttribute>());
-            Assert.Equal("Admin", authorize.Roles);
-        }
+        var methods = controllerType.GetMethods(
+            BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
+        Assert.All(methods, method =>
+            Assert.Empty(method.GetCustomAttributes<AuthorizeAttribute>()));
     }
 
     [Theory]

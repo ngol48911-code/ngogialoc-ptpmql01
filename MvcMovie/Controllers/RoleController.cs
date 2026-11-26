@@ -1,9 +1,11 @@
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MvcMovie.Models;
+using MvcMovie.Services;
 
 namespace MvcMovie.Controllers;
 
@@ -12,13 +14,16 @@ public class RoleController : Controller
 {
     private readonly RoleManager<IdentityRole> _roleManager;
     private readonly UserManager<IdentityUser> _userManager;
+    private readonly PermissionScannerService _permissionScanner;
 
     public RoleController(
         RoleManager<IdentityRole> roleManager,
-        UserManager<IdentityUser> userManager)
+        UserManager<IdentityUser> userManager,
+        PermissionScannerService permissionScanner)
     {
         _roleManager = roleManager;
         _userManager = userManager;
+        _permissionScanner = permissionScanner;
     }
 
     [HttpGet]
@@ -74,6 +79,109 @@ public class RoleController : Controller
         return role == null
             ? NotFound(new { message = "Không tìm thấy nhóm quyền." })
             : Ok(await ToResponseAsync(role));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> GetRolePermissions(string roleId)
+    {
+        var role = await _roleManager.FindByIdAsync(roleId);
+        if (role == null)
+        {
+            return NotFound(new { message = "Không tìm thấy nhóm quyền." });
+        }
+
+        var selectedPermissions = (await _roleManager.GetClaimsAsync(role))
+            .Where(claim => claim.Type == PermissionScannerService.PermissionClaimType)
+            .Select(claim => claim.Value);
+        return Ok(new RolePermissionManageDto(
+            role.Id,
+            role.Name ?? string.Empty,
+            _permissionScanner.GetControllerPermissions(selectedPermissions)));
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> UpdateRolePermissions(
+        [FromBody] UpdateRolePermissionsRequest? model)
+    {
+        if (model == null)
+        {
+            return BadRequest(new { message = "Dữ liệu phân quyền không hợp lệ." });
+        }
+
+        if (ModelState.IsValid)
+        {
+            ValidatePermissionRequest(model);
+        }
+        if (!ModelState.IsValid)
+        {
+            return PermissionValidationError();
+        }
+
+        var role = await _roleManager.FindByIdAsync(model.RoleId!);
+        if (role == null)
+        {
+            return NotFound(new { message = "Không tìm thấy nhóm quyền." });
+        }
+
+        if (string.Equals(role.Name, "Admin", StringComparison.OrdinalIgnoreCase))
+        {
+            return BadRequest(new
+            {
+                message = "Role Admin có toàn quyền mặc định và không thể chỉnh sửa quyền Action."
+            });
+        }
+
+        var requestedPermissions = model.Permissions!
+            .Distinct(StringComparer.Ordinal)
+            .ToArray();
+        var allowedPermissions = _permissionScanner
+            .GetControllerPermissions()
+            .SelectMany(group => group.Actions)
+            .Select(action => action.ClaimValue)
+            .ToHashSet(StringComparer.Ordinal);
+        foreach (var permission in requestedPermissions)
+        {
+            if (!allowedPermissions.Contains(permission))
+            {
+                ModelState.AddModelError(
+                    nameof(UpdateRolePermissionsRequest.Permissions),
+                    $"Quyền '{permission}' không hợp lệ.");
+            }
+        }
+        if (!ModelState.IsValid)
+        {
+            return PermissionValidationError("Danh sách quyền chứa Action không hợp lệ.");
+        }
+
+        var existingPermissions = (await _roleManager.GetClaimsAsync(role))
+            .Where(claim => claim.Type == PermissionScannerService.PermissionClaimType)
+            .ToArray();
+        foreach (var claim in existingPermissions)
+        {
+            var removeResult = await _roleManager.RemoveClaimAsync(role, claim);
+            if (!removeResult.Succeeded)
+            {
+                return PermissionIdentityError(
+                    removeResult,
+                    "Không thể xóa các quyền Action hiện tại.");
+            }
+        }
+
+        foreach (var permission in requestedPermissions)
+        {
+            var addResult = await _roleManager.AddClaimAsync(
+                role,
+                new Claim(PermissionScannerService.PermissionClaimType, permission));
+            if (!addResult.Succeeded)
+            {
+                return PermissionIdentityError(
+                    addResult,
+                    "Không thể lưu các quyền Action đã chọn.");
+            }
+        }
+
+        return Ok(new { message = "Đã cập nhật quyền Action cho nhóm quyền." });
     }
 
     [HttpPost]
@@ -238,6 +346,31 @@ public class RoleController : Controller
         }
     }
 
+    private void ValidatePermissionRequest(UpdateRolePermissionsRequest model)
+    {
+        var validationResults = new List<ValidationResult>();
+        Validator.TryValidateObject(
+            model,
+            new ValidationContext(model),
+            validationResults,
+            validateAllProperties: true);
+
+        foreach (var validationResult in validationResults)
+        {
+            var memberName = validationResult.MemberNames.FirstOrDefault();
+            ModelState.AddModelError(
+                memberName ?? string.Empty,
+                validationResult.ErrorMessage ?? "Dữ liệu không hợp lệ.");
+        }
+
+        if (model.Permissions?.Any(string.IsNullOrWhiteSpace) == true)
+        {
+            ModelState.AddModelError(
+                nameof(UpdateRolePermissionsRequest.Permissions),
+                "Giá trị quyền không được để trống.");
+        }
+    }
+
     private void AddIdentityErrors(IdentityResult result)
     {
         foreach (var error in result.Errors)
@@ -259,6 +392,38 @@ public class RoleController : Controller
                         .Select(error => error.ErrorMessage)
                         .Where(message => !string.IsNullOrWhiteSpace(message))
                         .ToArray())
+        });
+    }
+
+    private BadRequestObjectResult PermissionValidationError(
+        string message = "Vui lòng kiểm tra lại danh sách quyền.")
+    {
+        return BadRequest(new
+        {
+            message,
+            errors = ModelState
+                .Where(entry => entry.Value?.Errors.Count > 0)
+                .ToDictionary(
+                    entry => entry.Key,
+                    entry => entry.Value!.Errors
+                        .Select(error => error.ErrorMessage)
+                        .Where(error => !string.IsNullOrWhiteSpace(error))
+                        .ToArray())
+        });
+    }
+
+    private BadRequestObjectResult PermissionIdentityError(
+        IdentityResult result,
+        string message)
+    {
+        return BadRequest(new
+        {
+            message,
+            errors = new Dictionary<string, string[]>
+            {
+                [nameof(UpdateRolePermissionsRequest.Permissions)] =
+                    result.Errors.Select(error => error.Description).ToArray()
+            }
         });
     }
 }

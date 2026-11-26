@@ -92,6 +92,8 @@ ngogialoc-ptpmql01/
     │   └── UserController.cs
     ├── Data/
     │   └── ApplicationDbcontext.cs    # DbContext và seed Faculties
+    ├── Filters/
+    │   └── DynamicPermissionFilter.cs
     ├── Models/
     │   ├── Person.cs
     │   ├── Movie.cs
@@ -103,7 +105,10 @@ ngogialoc-ptpmql01/
     │   ├── StudentResponseDto.cs
     │   ├── RoleDto.cs
     │   ├── RoleResponseDto.cs
-    │   └── UserRoleDtos.cs
+    │   ├── UserRoleDtos.cs
+    │   └── RolePermissionDtos.cs
+    ├── Services/
+    │   └── PermissionScannerService.cs
     ├── Migrations/                    # Lịch sử migration EF Core
     ├── Views/
     │   ├── Shared/
@@ -217,6 +222,20 @@ thị toàn bộ role hiện có và cho phép cập nhật lựa chọn. Các t
 Admin đang đăng nhập không thể tự gỡ role `Admin`; request cập nhật gửi
 anti-forgery token qua header `RequestVerificationToken`.
 
+### 4.6. Phân quyền động theo Action
+
+`PermissionScannerService` quét public Action hợp lệ của các controller MVC
+(ngoại trừ `Home`, `Role`, `User`) để tạo ma trận quyền. Quyền của role được lưu
+trong bảng Identity `AspNetRoleClaims` dưới dạng claim `Permission` với giá trị
+`Controller.Action`, ví dụ `Student.CreateAjax`. `DynamicPermissionFilter` kiểm
+tra claim trên các role hiện tại của người dùng ở mỗi request, vì vậy thay đổi
+ma trận có hiệu lực ngay mà không cần đăng nhập lại. Admin được bypass; `Home`,
+`Role`, `User` và các trang trong Area `Identity` được miễn bộ lọc động.
+
+Request AJAX thiếu quyền nhận `403` cùng JSON thông báo; request trình duyệt
+được chuyển tới `/Identity/Account/AccessDenied`. Trang Role cho phép quản trị
+ma trận Action, còn các thao tác Role/User vẫn chỉ dành cho Admin.
+
 ---
 
 ## 5. Thiết kế cơ sở dữ liệu
@@ -245,11 +264,14 @@ Faculties
 AspNetRoles
 AspNetUsers
 AspNetUserRoles
+AspNetRoleClaims
 ```
 
 Các bảng Identity đã có trong migration hiện tại; chức năng quản lý nhóm quyền
 tái sử dụng `RoleManager<IdentityRole>` và `UserManager<IdentityUser>`, không
 thêm bảng hoặc migration.
+Quyền Action cũng tái sử dụng bảng `AspNetRoleClaims` hiện có, không thay đổi
+schema hoặc migration.
 
 ### Quan hệ
 
@@ -559,6 +581,7 @@ Các nhóm test có thể bao gồm:
 - CRUD Student.
 - Tìm kiếm/phân trang và CRUD nhóm quyền, bao gồm bảo vệ role hệ thống và role có người dùng.
 - Tìm kiếm/phân trang người dùng, lọc role, cập nhật role và chống Admin tự gỡ quyền.
+- Quét Action, cập nhật Role Claims và kiểm tra quyền động cho request thường/AJAX.
 - Phân trang và chuẩn hóa trang.
 
 Test database dùng provider InMemory thay vì ghi trực tiếp vào `App.db`.
@@ -606,6 +629,8 @@ Test database dùng provider InMemory thay vì ghi trực tiếp vào `App.db`.
 | `POST` | `/Role/CreateAjax` | Tạo nhóm quyền (JSON + anti-forgery token) |
 | `PUT` | `/Role/EditAjax/{id}` | Đổi tên nhóm quyền tùy chỉnh |
 | `DELETE` | `/Role/DeleteAjax/{id}` | Xóa nhóm quyền trống |
+| `GET` | `/Role/GetRolePermissions?roleId={id}` | Lấy ma trận quyền Action của role |
+| `POST` | `/Role/UpdateRolePermissions` | Cập nhật Permission claims (JSON + anti-forgery token) |
 
 Toàn bộ `RoleController` yêu cầu role `Admin`. Validation trả về `400` với
 thông báo tiếng Việt; role không tồn tại trả về `404`. Không thể đổi tên/xóa
@@ -624,6 +649,11 @@ của `site.js`.
 `UserController` yêu cầu role `Admin`. API không cho Admin đang đăng nhập tự
 loại bỏ role `Admin` của chính mình và trả về `400` với thông báo tiếng Việt.
 Các lỗi chưa đăng nhập/không đủ quyền trả về `401`/`403` cho AJAX.
+
+Role `Admin` luôn có toàn quyền và không thể sửa ma trận Permission. Các role
+khác chỉ được thực hiện những Action có claim tương ứng, ví dụ
+`Permission = Student.CreateAjax`. `DynamicPermissionFilter` trả JSON
+`403 Forbidden` cho AJAX và chuyển request trình duyệt tới AccessDenied.
 
 Tham số phân trang mẫu:
 

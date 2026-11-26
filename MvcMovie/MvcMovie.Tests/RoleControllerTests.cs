@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using MvcMovie.Controllers;
 using MvcMovie.Data;
 using MvcMovie.Models;
+using MvcMovie.Services;
 
 namespace MvcMovie.Tests;
 
@@ -140,6 +141,7 @@ public class RoleControllerTests
         services.AddIdentityCore<IdentityUser>()
             .AddRoles<IdentityRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>();
+        services.AddSingleton<PermissionScannerService>();
 
         var provider = services.BuildServiceProvider();
         var scope = provider.CreateScope();
@@ -149,18 +151,20 @@ public class RoleControllerTests
             provider,
             scope,
             scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>(),
-            scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>());
+            scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>(),
+            scope.ServiceProvider.GetRequiredService<PermissionScannerService>());
     }
 
     private sealed class RoleControllerFixture(
         ServiceProvider provider,
         IServiceScope scope,
         RoleManager<IdentityRole> roleManager,
-        UserManager<IdentityUser> userManager) : IAsyncDisposable
+        UserManager<IdentityUser> userManager,
+        PermissionScannerService permissionScanner) : IAsyncDisposable
     {
         public RoleManager<IdentityRole> RoleManager { get; } = roleManager;
         public UserManager<IdentityUser> UserManager { get; } = userManager;
-        public RoleController Controller { get; } = new(roleManager, userManager);
+        public RoleController Controller { get; } = new(roleManager, userManager, permissionScanner);
 
         public ValueTask DisposeAsync()
         {

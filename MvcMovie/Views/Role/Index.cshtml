@@ -30,12 +30,13 @@
                 <th>Tên chuẩn hóa</th>
                 <th>Số người dùng</th>
                 <th>Loại</th>
+                <th>Quyền Action</th>
                 <th>Hành động</th>
             </tr>
         </thead>
         <tbody id="roleTableBody">
             <tr>
-                <td colspan="5" class="text-center">Đang tải dữ liệu...</td>
+                <td colspan="6" class="text-center">Đang tải dữ liệu...</td>
             </tr>
         </tbody>
     </table>
@@ -67,6 +68,37 @@
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                     <button type="submit" class="btn btn-primary" id="saveRoleButton">Lưu</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="permissionModal" tabindex="-1"
+     aria-labelledby="permissionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h5 class="modal-title" id="permissionModalLabel">Phân quyền Action</h5>
+                    <div class="text-muted" id="permissionRoleName"></div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <form id="permissionForm" novalidate>
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <div id="permissionFormError" class="alert alert-danger d-none"></div>
+                    <div class="d-flex justify-content-end mb-3">
+                        <button type="button" class="btn btn-sm btn-outline-primary" id="toggleAllPermissions">
+                            Chọn tất cả
+                        </button>
+                    </div>
+                    <div id="permissionGroups" class="row g-3"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-primary" id="savePermissionsButton">Lưu quyền</button>
                 </div>
             </form>
         </div>

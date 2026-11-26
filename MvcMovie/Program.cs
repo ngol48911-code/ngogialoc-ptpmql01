@@ -2,6 +2,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using MvcMovie.Data;
+using MvcMovie.Filters;
+using MvcMovie.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
@@ -56,7 +58,10 @@ builder.Services.ConfigureApplicationCookie(options =>
 });
 
 // Add services to the container.
-builder.Services.AddControllersWithViews();
+builder.Services.AddSingleton<PermissionScannerService>();
+builder.Services.AddScoped<DynamicPermissionFilter>();
+builder.Services.AddControllersWithViews(options =>
+    options.Filters.AddService<DynamicPermissionFilter>());
 builder.Services.AddRazorPages();
 
 var app = builder.Build();
