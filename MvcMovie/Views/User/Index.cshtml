@@ -1,0 +1,85 @@
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    ViewData["Title"] = "Quản lý Người dùng";
+    var roles = ViewBag.RoleFilters as IEnumerable<string> ?? Enumerable.Empty<string>();
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Quản lý Người dùng</h1>
+</div>
+
+<div id="userAlert" class="alert d-none" role="alert"></div>
+
+<div class="row g-2 mb-3">
+    <div class="col-md-7">
+        <input id="userSearch" class="form-control" type="search" placeholder="Tìm theo email..." />
+    </div>
+    <div class="col-md-3">
+        <select id="userRoleFilter" class="form-select" aria-label="Lọc theo nhóm quyền">
+            <option value="">-- Tất cả nhóm quyền --</option>
+            @foreach (var role in roles)
+            {
+                <option value="@role">@role</option>
+            }
+        </select>
+    </div>
+    <div class="col-md-2">
+        <select id="userPageSize" class="form-select" aria-label="Số dòng mỗi trang">
+            <option value="5">5 dòng</option>
+            <option value="10" selected>10 dòng</option>
+            <option value="20">20 dòng</option>
+        </select>
+    </div>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-bordered table-striped align-middle">
+        <thead class="table-dark">
+            <tr>
+                <th>Email</th>
+                <th>Xác thực email</th>
+                <th>Nhóm quyền</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody id="userTableBody">
+            <tr>
+                <td colspan="4" class="text-center">Đang tải dữ liệu...</td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+    <span id="userPageInfo" class="text-muted"></span>
+    <nav aria-label="Phân trang người dùng">
+        <ul id="userPagination" class="pagination mb-0"></ul>
+    </nav>
+</div>
+
+<div class="modal fade" id="userRoleModal" tabindex="-1" aria-labelledby="userRoleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userRoleModalLabel">Phân quyền người dùng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <form id="userRoleForm" novalidate>
+                @Html.AntiForgeryToken()
+                <div class="modal-body">
+                    <div id="userRoleError" class="alert alert-danger d-none"></div>
+                    <p id="managedUserEmail" class="fw-semibold"></p>
+                    <div id="userRoleCheckboxes" class="vstack gap-2"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                    <button type="submit" class="btn btn-primary" id="saveUserRolesButton">Lưu phân quyền</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/user-role.js" asp-append-version="true"></script>
+}

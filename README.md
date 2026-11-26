@@ -88,7 +88,8 @@ ngogialoc-ptpmql01/
     │   ├── PersonController.cs
     │   ├── MovieController.cs
     │   ├── StudentController.cs
-    │   └── RoleController.cs
+    │   ├── RoleController.cs
+    │   └── UserController.cs
     ├── Data/
     │   └── ApplicationDbcontext.cs    # DbContext và seed Faculties
     ├── Models/
@@ -101,7 +102,8 @@ ngogialoc-ptpmql01/
     │   ├── MovieResponseDto.cs
     │   ├── StudentResponseDto.cs
     │   ├── RoleDto.cs
-    │   └── RoleResponseDto.cs
+    │   ├── RoleResponseDto.cs
+    │   └── UserRoleDtos.cs
     ├── Migrations/                    # Lịch sử migration EF Core
     ├── Views/
     │   ├── Shared/
@@ -111,7 +113,8 @@ ngogialoc-ptpmql01/
     │   ├── Movie/
     │   ├── Student/
     │   ├── Home/
-    │   └── Role/
+    │   ├── Role/
+    │   └── User/
     ├── wwwroot/
     │   ├── css/
     │   ├── js/
@@ -205,6 +208,15 @@ Hai nhóm quyền hệ thống `Admin` và `User` không thể sửa hoặc xóa
 đang được gán cho người dùng cũng không thể xóa. Mọi yêu cầu thay đổi dữ liệu
 đều gửi anti-forgery token trong header `RequestVerificationToken`.
 
+### 4.5. Quản lý người dùng và gán role
+
+Trang `/User` dành cho Admin, hỗ trợ tìm người dùng theo email, lọc theo role,
+phân trang 5/10/20 dòng và xem trạng thái xác thực email. Modal phân quyền hiển
+thị toàn bộ role hiện có và cho phép cập nhật lựa chọn. Các thay đổi dùng
+`UserManager<IdentityUser>`/`RoleManager<IdentityRole>` trên bảng Identity sẵn có.
+Admin đang đăng nhập không thể tự gỡ role `Admin`; request cập nhật gửi
+anti-forgery token qua header `RequestVerificationToken`.
+
 ---
 
 ## 5. Thiết kế cơ sở dữ liệu
@@ -231,6 +243,7 @@ Movies
 Students
 Faculties
 AspNetRoles
+AspNetUsers
 AspNetUserRoles
 ```
 
@@ -374,7 +387,7 @@ CSS tùy chỉnh nằm trong `wwwroot/css/app.css`. `app.css` được nạp sau
 Layout chung chứa:
 
 - Thanh điều hướng
-- Menu dẫn tới Person, Student, Movie và Quản lý Role (Role chỉ hiển thị với Admin)
+- Menu dẫn tới Person, Student, Movie, Quản lý Role và Quản lý Người dùng (hai mục quản trị chỉ hiển thị với Admin)
 - Container render `@RenderBody()`
 - Footer
 - Bootstrap Bundle JavaScript
@@ -455,6 +468,7 @@ http://localhost:5001
 | `/Movie` | Danh sách phim |
 | `/Student` | Danh sách sinh viên |
 | `/Role` | Quản lý nhóm quyền (Admin) |
+| `/User` | Quản lý người dùng và role (Admin) |
 
 ---
 
@@ -544,6 +558,7 @@ Các nhóm test có thể bao gồm:
 - CRUD Movie.
 - CRUD Student.
 - Tìm kiếm/phân trang và CRUD nhóm quyền, bao gồm bảo vệ role hệ thống và role có người dùng.
+- Tìm kiếm/phân trang người dùng, lọc role, cập nhật role và chống Admin tự gỡ quyền.
 - Phân trang và chuẩn hóa trang.
 
 Test database dùng provider InMemory thay vì ghi trực tiếp vào `App.db`.
@@ -597,6 +612,18 @@ thông báo tiếng Việt; role không tồn tại trả về `404`. Không th�
 `Admin` hoặc `User`, và không thể xóa role đang được gán cho người dùng. Giao
 diện dùng chung modal Bootstrap và các hàm `renderPagination`/`renderPageInfo`
 của `site.js`.
+
+### User
+
+| Method | Route | Chức năng |
+|---|---|---|
+| `GET` | `/User/GetUsers?searchString=&roleFilter=&pageIndex=1&pageSize=10` | Tìm, lọc và phân trang người dùng cùng danh sách role |
+| `GET` | `/User/GetUserRoles?userId={id}` | Lấy toàn bộ role và trạng thái được gán |
+| `PUT` | `/User/UpdateUserRoles` | Cập nhật role bằng JSON và anti-forgery token |
+
+`UserController` yêu cầu role `Admin`. API không cho Admin đang đăng nhập tự
+loại bỏ role `Admin` của chính mình và trả về `400` với thông báo tiếng Việt.
+Các lỗi chưa đăng nhập/không đủ quyền trả về `401`/`403` cho AJAX.
 
 Tham số phân trang mẫu:
 
